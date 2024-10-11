@@ -180,6 +180,18 @@ def maplot(df: gpd.GeoDataFrame, col=None, ax=None, size=(6, 6),
     return ax
 
 
+def imsave(title=None, fig=None, ax=None, dpi=300,
+           root='./fig', ext='png', opaque=True):
+    """Save the current matplotlib figure to disk."""
+    fig = fig or plt.gcf()
+    ax = ax or fig.axes[0]
+    title = title or fig._suptitle or ax.get_title() or 'Untitled {}'.format(
+        dt.now().strftime('%Y-%m-%d_%H-%m-%S'))
+    title = re.sub(r'[^A-Za-z\s\d,.-]', '_', title)
+    fig.savefig(f'{mkdir(root)}/{title}.{ext}', dpi=dpi, bbox_inches='tight',
+                transparent=not opaque, facecolor='white' if opaque else 'auto')
+
+
 def disp(x: Pdf | Series | Gdf | GeoSeries, top: int = 1, mem=True):
     """Custom display for pandas and geopandas dataframe and series objects 
     in Jupyter. This is a combination of methods like `head`, `dtypes`, and
