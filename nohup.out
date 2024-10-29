@@ -1,0 +1,12 @@
+Exception ignored in: <function TransportNetwork.__del__ at 0x7f9805b75f80>
+Traceback (most recent call last):
+  File "/home/umni2/a/umnilab/users/verma99/anaconda3/envs/rv3.12/lib/python3.12/site-packages/r5py/r5/transport_network.py", line 99, in __del__
+    self.osm_file.close()
+    ^^^^^^^^^^^^^
+AttributeError: 'TransportNetwork' object has no attribute 'osm_file'
+Exception ignored in: <function TransportNetwork.__del__ at 0x7f709275df80>
+Traceback (most recent call last):
+  File "/home/umni2/a/umnilab/users/verma99/anaconda3/envs/rv3.12/lib/python3.12/site-packages/r5py/r5/transport_network.py", line 99, in __del__
+    self.osm_file.close()
+    ^^^^^^^^^^^^^
+AttributeError: 'TransportNetwork' object has no attribute 'osm_file'

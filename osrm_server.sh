@@ -7,14 +7,12 @@
 ## Once the server starts, the Python script 'osrm.py' is to be used to compute 
 ## the OD matrix and write in parquet files.
 ## 
-## Example: 'zsh osrm.sh 12060-atlanta drive'
+## Example: 'zsh osrm_server.sh atlanta drive'
 ## 
 ## Parameters:
-## - 'city': (Required) ID of the region, given by the syntax
-##     '{FIPS code}-{friendly-name}'.
-##     The friendly name must be the same as the one for which OSM file 
-##     exists on the GeoFabrik server. For example, '35620-new-york' indicates
-##     the New York City metro area whose FIPS code is 35620.
+## - 'city': (Required) Name of the target city. It should be in lower case,
+##     with spaces replaced with hyphen and other special characters removed.
+##     E.g., for New York City, it would be 'new-york'.
 ## 
 ## - 'mode': (Required) Mode of travel. The server initialization requires setting
 ##     up routing for a specific profile specified by its mode of travel.
@@ -41,8 +39,12 @@ if [[ ! " ${modes[*]} " =~ " ${mode} " ]]; then
     exit 1
 fi
 echo "-----\nPROCESSING '$city' by '$mode' on port $port"
+# create a temporary working directory and copy the city's OSM file here
+tmp=data/osrm/tmp
+mkdir -p $tmp
+cp data/osm/city/$city.osm.pbf $tmp
 # mount the OSM data directory for the given region to the docker image
-data_dir="$PWD/data/osrm/$city:/data"
+data_dir="$PWD/$tmp:/data"
 # resolve the compressed OSM database file (PBF format) in docker
 pbf_file=/data/$city.osm.pbf
 # base URL for the OSRM backend
@@ -68,4 +70,4 @@ echo "Setting up routing server on http://0.0.0.0:$port"
 sudo docker run -p $port:$port -v $data_dir $url osrm-routed \
 --port $port --max-table-size $nmax --algorithm mld $osrm_file
 # compute the distances & travel times
-# python get_ttm.py -c $city -m $mode -p $port
+# python get_ttm_osrm.py -c $city -m $mode -p $port

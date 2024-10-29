@@ -23,7 +23,7 @@ from numpy import array as Arr
 import pandas as pd
 from pandas import DataFrame as Pdf
 from pandas import Series
-from pyarrow.parquet import read_schema
+# from pyarrow.parquet import read_schema
 import seaborn as sns
 from tqdm.notebook import tqdm
 
@@ -62,7 +62,7 @@ plt.rcParams.update({
     'figure.dpi': 150,
     'figure.titlesize': 15,
     'font.family': 'sans-serif',
-    'font.sans-serif': ['Arial', 'DejaVu Serif'],
+    'font.sans-serif': ['Arial', 'Noto Sans', 'DejaVu Serif'],
     'grid.alpha': 0.15,
     'grid.color': 'k',
     'grid.linewidth': 0.5,
