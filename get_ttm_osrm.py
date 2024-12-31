@@ -42,7 +42,7 @@ def get_ttm(city, mode, level, ip, batch_size=3000,
         return
     tstart = dt.datetime.now()
     mode_label = 'driving' if mode == 'drive' else mode
-    pts = pd.read_parquet('data/centroids.parquet')
+    pts = pd.read_parquet('data/geometry/centroids.parquet')
     pts = filt(pts, city=city, level=level)
     if len(pts) <= 1:
         return
@@ -50,7 +50,7 @@ def get_ttm(city, mode, level, ip, batch_size=3000,
     batches = list(np.arange(0, len(pts), batch_size)) + [len(pts)]
     combs = np.split(np.arange(0, len(pts)), batches)[1:-1]
     ttm = [] # output travel time matrix
-    for ix, iy in tqdm(it.product(*[combs] * 2), total=len(combs) ** 2):
+    for ix, iy in it.product(*[combs] * 2):
         src = 'sources=' + ';'.join(ix.astype(str))
         trg = 'destinations=' + ';'.join(iy.astype(str))
         annot = 'annotations=distance,duration'
@@ -61,16 +61,16 @@ def get_ttm(city, mode, level, ip, batch_size=3000,
         dist = (Pdf(data['distances'], index=ix, columns=iy)
                 .rename_axis('src_i').reset_index()
                 .melt('src_i', var_name='trg_i', value_name='dist'))
-        dur = (Pdf(data['durations'] / 60, index=ix, columns=iy)
+        dur = (Pdf(Arr(data['durations']) / 60, index=ix, columns=iy)
                .reset_index().melt('index', value_name='time'))
         df = pd.concat([dist, dur['time']], axis=1)
         df = df.query(f'0 <= time <= {max_time}')
         df = df.astype(D(src_i=I32, trg_i=I32, dist=F32, time=F32))
         ttm.append(df)
     ttm = (pd.concat(ttm).reset_index(drop=1)
-             .merge(pts.geoid.rename('src'), left_on='src_i', right_index=True)
-             .merge(pts.geoid.rename('trg'), left_on='trg_i', right_index=True)
-             .astype(D(src=CAT, trg=CAT))[['src', 'trg', 'dist', 'time']])
+           .merge(pts.geoid.rename('src'), left_on='src_i', right_index=True)
+           .merge(pts.geoid.rename('trg'), left_on='trg_i', right_index=True)
+           .astype(D(src=CAT, trg=CAT))[['src', 'trg', 'dist', 'time']])
     ttm.to_parquet(outpath, compression='gzip')
     tend = dt.datetime.now()
     print(f'{tend}: Runtime for {city}/{mode}/{level}: {tend - tstart}')

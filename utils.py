@@ -98,6 +98,15 @@ def factor(x):
     return pd.Categorical(x, categories=cats)
 
 
+def normalize(x, vmin=None, vmax=None):
+    """Normalize an array of values to fit in the range [0, 1]."""
+    if isinstance(x, list) or isinstance(x, tuple):
+        x = np.array(x)
+    vmin = vmin or np.min(x)
+    vmax = vmax or np.max(x)
+    return (x - vmin) / (vmax - vmin)
+
+
 def filt(df: Pdf, reset: bool = True, **kwargs) -> Pdf:
     """Filter a dataframe with keyword arguments."""
     masks = [(df[k] == v) for k, v in kwargs.items()]
@@ -186,7 +195,7 @@ def imsave(title=None, fig=None, ax=None, dpi=300,
     fig = fig or plt.gcf()
     ax = ax or fig.axes[0]
     title = title or fig._suptitle or ax.get_title() or 'Untitled {}'.format(
-        dt.now().strftime('%Y-%m-%d_%H-%m-%S'))
+        dt.datetime.now().strftime('%Y-%m-%d_%H-%m-%S'))
     title = re.sub(r'[^A-Za-z\s\d,.-]', '_', title)
     fig.savefig(f'{mkdir(root)}/{title}.{ext}', dpi=dpi, bbox_inches='tight',
                 transparent=not opaque, facecolor='white' if opaque else 'auto')
