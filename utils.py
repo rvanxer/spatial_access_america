@@ -23,7 +23,6 @@ from numpy import array as Arr
 import pandas as pd
 from pandas import DataFrame as Pdf
 from pandas import Series
-# from pyarrow.parquet import read_schema
 import seaborn as sns
 from tqdm.notebook import tqdm
 
@@ -234,8 +233,8 @@ def disp(x: Pdf | Series | Gdf | GeoSeries, top: int = 1, mem=True):
         f(False, False)
     return x
 
-# add the `disp` method to pandas and geopandas series & DF classes
-Pdf.disp = disp
-Gdf.disp = disp
-Series.disp = disp
-GeoSeries.disp = disp
+# # add the `disp` method to pandas and geopandas series & DF classes
+# Pdf.disp = disp
+# Gdf.disp = disp
+# Series.disp = disp
+# GeoSeries.disp = disp
