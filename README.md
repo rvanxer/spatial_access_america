@@ -69,14 +69,19 @@ These metrics can be understood with some examples:
 To use this code repository, it is best to create a [Conda](https://github.com/conda/conda) environment (named, for example, `saa`) and install the required dependencies after cloning this repository:
 
 ```
-conda create -n saa python>=3.12
+conda create -n saa python=3.12
 
 conda activate saa
 
 pip install -r requirements.txt
 ```
 
-## Description of source code files
+## Project pipeline
+The following figure illustrates the order of data collection and processing, the script and notebook files used, tools used, and the datasets generated.
+
+<img src="fig/Project pipeline.png" width=1200>
+
+<!-- The code files are briefly described below: -->
 | File | Description |
 | --- | --- |
 | [utils.py](utils.py) | Utility namespace for common packages, constants & helper functions used in the other files. |
