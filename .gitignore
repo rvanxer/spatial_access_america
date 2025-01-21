@@ -5,3 +5,5 @@ data
 fig/_old
 nohup.out
 Test.ipynb
+3_GTFS.ipynb
+6_Compare_cities.ipynb
