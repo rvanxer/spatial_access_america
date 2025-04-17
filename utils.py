@@ -23,6 +23,7 @@ from numpy import array as Arr
 import pandas as pd
 from pandas import DataFrame as Pdf
 from pandas import Series
+# from pyarrow.parquet import read_schema
 import seaborn as sns
 from tqdm.notebook import tqdm
 
@@ -200,7 +201,7 @@ def imsave(title=None, fig=None, ax=None, dpi=300,
                 transparent=not opaque, facecolor='white' if opaque else 'auto')
 
 
-def disp(x: Pdf | Series | Gdf | GeoSeries, top: int = 1, mem=True):
+def view(x: Pdf | Series | Gdf | GeoSeries, top: int = 1, mem=True):
     """Custom display for pandas and geopandas dataframe and series objects 
     in Jupyter. This is a combination of methods like `head`, `dtypes`, and
     `memory_usage`."""
@@ -232,9 +233,3 @@ def disp(x: Pdf | Series | Gdf | GeoSeries, top: int = 1, mem=True):
     elif isinstance(x, pd.Series):
         f(False, False)
     return x
-
-# # add the `disp` method to pandas and geopandas series & DF classes
-# Pdf.disp = disp
-# Gdf.disp = disp
-# Series.disp = disp
-# GeoSeries.disp = disp
