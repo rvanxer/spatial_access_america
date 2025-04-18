@@ -5,12 +5,12 @@
 
 **Contributors**: [Dr. Rajat Verma](https://rvanxer.github.io), [Shagun Mittal](https://umnilab.github.io/profiles/Shagun_Mittal), [Prof. Satish V. Ukkusuri](https://umnilab.github.io)
 
-<img src="fig/Cover figure.png" width=1200>
+<img src="fig/Study framework.png" width=1200>
 
 ## Abstract
 In geography and transportation planning, "spatial accessibility" is defined as the ease and extent to which opportunities (such as jobs, education, healthcare, etc.) can be visited within some travel constraints.
 
-This is a highly parametric dataset containing values of spatial accessibility measured by combinations of multiple measurement methods, travel modes, types of opportunity (such as jobs and different types of points of interest (POIs)), and travel time thresholds. This includes both cumulative opportunities types of measures as well as floating catchment area (FCA)-based competition metrics, including an in-house developed FCA metric aimed for cross-modal comparison. Based on these combinations, a total of 675 accessibility values are computed for each zone at three US Census administrative levels – county, census tract, and block group (BG) – for the 50 most populous urban areas of the United States.
+This is a highly parametric dataset containing values of spatial accessibility measured by combinations of multiple measurement methods, travel modes, types of opportunity (such as jobs and different types of points of interest (POIs)), and travel time thresholds. This includes both cumulative opportunities types of measures as well as floating catchment area (FCA)-based competition metrics, including an in-house developed FCA metric aimed for cross-modal comparison. Based on these combinations, a total of 600 accessibility values are computed for each zone at three US Census administrative levels – county, census tract, and block group (BG) – for the 50 most populous urban areas of the United States.
 
 Additionally, the dataset also includes the travel time matrix (TTM) files for each of these urban areas by three travel modes – driving, walking, and bicycling.
 
@@ -36,7 +36,7 @@ The access folder contains 50 compressed comma-separated value (CSV) (.csv.gz) f
 
 Each data file contains 684 columns. The first nine columns contain general information of the zone. This includes the zone identifier `geoid`, given by the [FIPS](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) code, a string of numbers with length 5, 11, and 12 for respectively counties, tracts, and BGs.
 The other eight columns include the zone's spatial level, latitude and longitude of its centroid, name of its enclosing county, its population and size of labor force, and the total number of jobs and POIs.
-The remaining columns denote the 675 accessibility metrics given in the general format of `{measure}_{kind}_{mode}_{threshold}`. These are explained in the following table. A complete list of these metric columns is provided in the helper file `access_metrics.csv`.
+The remaining columns denote the 600 accessibility metrics given in the general format of `{measure}_{kind}_{mode}_{threshold}`. These are explained in the following table. A complete list of these metric columns is provided in the helper file [dashboard/access_metrics.csv](dashboard/access_metrics.csv).
 
 | Category | Code | Description/Formula |
 | - | - | - |
@@ -44,16 +44,18 @@ The remaining columns denote the 675 accessibility metrics given in the general 
 | | `Gr` | Gravity measure: Weights opportunities by the time taken to reach them, given by 'impedance functions'. See [this paper](https://www.sciencedirect.com/science/article/pii/S0966692324002709) for info about impedance functions. |
 | | `E2` | [Enhanced 2-Step Floating Catchment Area](https://www.sciencedirect.com/science/article/pii/S1353829209000574) |
 | | `M2` | [Modified 2-Step Floating Catchment Area](https://doi.org/10.1016/j.healthplace.2013.07.012) |
-| | `XM` | Cross-Modal Floating Catchment Area (XMFCA) | 
 | `{kind}` of opportunity | `jobTot` | All jobs |
-| | `jobWag` | Low-wage jobs |
-| | `jobEdu` | Jobs for low-education workers |
+| | `jobWag` | Low-wage jobs (<$20k/yr) |
+| | `jobEdu` | Jobs for workers without a college degree |
 | | `jobPOC` | Jobs for people of color |
-| | `poiTot` | All POIs |
-| | `poiEdu` | Educational facilities |
+| | `poiTot` | All points of interest (POIs) |
+| | `poiEdu` | Educational institutions |
 | | `poiGro` | Grocery shopping places |
 | | `poiMed` | Medical amenities |
 | | `poiSoc` | Social support facilities |
+| | `evStat` | Electric vehicle (EV) charging stations |
+| | `evseLE` | EV supply equipment: Level 2 chargers |
+| | `evseDC` | EV supply equipment: Fast DC chargers |
 | `{mode}` of travel | `Dr` | Driving (car) |
 | | `Bi` | Bicycling |
 | | `Wa` | Walking |
@@ -63,18 +65,34 @@ These metrics can be understood with some examples:
 - The total number of grocery stores reachable (‘contour’ metric) by walking within 30 minutes is given by the field `Co_poiGro_Wa_30`.
 - The number of jobs for people of color reachable with impedance decay (‘gravity’ metric) by driving within 60 minutes is given by `Gr_jobPOC_Dr_60`.
 - Accessibility to medical facilities is usually measured by competition metrics because of competition for their limited capacity. Thus, it would be reasonable to use a metric like `M2_poiMed_Dr_30` to denote access to medical facilities by car within 30 minutes.
-- When the purpose is to compare competition accessibility across modes, it is suitable to use the XMFCA metric. For example, to get the total accessibility to educational places by active transport (walking and bicycling), it is suitable to add the XMFCA access values: `XM_poiEdu_Wa_30` + `XM_poiEdu_Bi_30`.
+<!-- - When the purpose is to compare competition accessibility across modes, it is suitable to use the XMFCA metric. For example, to get the total accessibility to educational places by active transport (walking and bicycling), it is suitable to add the XMFCA access values: `XM_poiEdu_Wa_30` + `XM_poiEdu_Bi_30`. -->
+
+> **Note**: Access to EV charging infrastructure is only available by driving, not by walking or bicycling.
 
 ## Usage
 To use this code repository, it is best to create a [Conda](https://github.com/conda/conda) environment (named, for example, `saa`) and install the required dependencies after cloning this repository:
 
 ```
 conda create -n saa python=3.12
-
 conda activate saa
-
 pip install -r requirements.txt
 ```
+
+## Dashboard
+In addition to downloading the dataset and reviewing its generation code, this repository additionally includes the code of a lightweight interactive tool to demonstrate the nature of this dataset. It is a [Plotly](https://plotly.com)/[Dash](https://dash.plotly.com)-based dashboard that allows users to visualize the spatial distribution of a selected access metric for an urban area.
+
+This demo tool relies on a sample dataset (in [dashboard/dashboard_data.parquet](dashboard/dashboard_data.parquet)) that includes 120 of the 600 overall access metrics for 10 out of the 50 overall urban areas included in the original dataset. Users can select one metric, urban area, and spatial scale using dropdown menus. Its default screen is shown in the screenshot below which shows the distribution of contour acesss to jobs by driving within 30 minutes, i.e., `Co_jobTot_Dr_30`, for the census tracts of the Austin metropolitan area in Texas.
+
+<img src="fig/Dashboard screenshot.jpg" width=1200>
+
+This applet needs to be run on a local Dash development server by simply running a Python script:
+```
+cd dashboard
+python dashboard.py
+```
+> **Note**: Dash requires JavaScript libraries like [Node](https://nodejs.org) and [Leaflet](https://leafletjs.com). If you do not have those installed, please install them first.
+
+This tool is only meant for illustration and requires a lot of improvements for production-level quality. Please feel free to contribute to making this tool more complete, feature rich, and user/developer friendly.
 
 ## Project pipeline
 The following figure illustrates the order of data collection and processing, the script and notebook files used, tools used, and the datasets generated.
@@ -95,3 +113,4 @@ The following figure illustrates the order of data collection and processing, th
 | [4_Compute_access.ipynb](4_Compute_access.ipynb) | Compute several measures of accessibility for the study regions using data prepared in the previous files. |
 | [5_Compare_with_AAA.ipynb](5_Compare_with_AAA.ipynb) | Compare the SAA access values with the values obtained from the [Accessibility Across America (AAA)](https://www.cts.umn.edu/programs/ao) dataset. |
 | [5_Scale_consistency.ipynb](5_Scale_consistency.ipynb) | Perform scale consistency check of accessibility data between (a) county vs tract and (b) tract vs BG levels. |
+| [dashboard/dashboard.py](dashboard/dashboard.py) | Create a Plotly-based lightweight dashboard for visualizing access distributio on a subset of the access data. |
